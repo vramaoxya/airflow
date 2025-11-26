@@ -1,0 +1,6 @@
+scripts/*.json
+scripts/*.py
+*.json
+logs/*
+
+
