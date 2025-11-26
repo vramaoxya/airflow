@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: mrt_products_brands_monthly
+    description: '{{ doc("mrt_products_brands_monthly") }}'
+    columns:
+      - name: brand
+        description: "The list of brands"
+        data_tests:
+          - not_null

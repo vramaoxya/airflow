@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: mrt_stores_sales_monthly
+    description: '{{ doc("mrt_stores_sales_monthly") }}'
+    columns:
+      - name: year
+        description: "The year of sell"
+        data_tests:
+          - not_null
+      - name: month
+        description: "The month of sell"
+        data_tests:
+          - not_null          
+      - name: total_sales_Santa Cruz Bikes
+        description: "The total number of items sold in th store of Santa Cruz Bikes"
+      - name: total_sales_Baldwin Bikes
+        description: "The total number of items sold in th store of Baldwin Bikes"
+      - name: total_sales_Rowlett Bikes
+        description: "The total number of items sold in th store of Rowlett Bikes"

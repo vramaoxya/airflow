@@ -1,0 +1,12 @@
+local_bike:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "databird-473015"      # ex: "my-gcp-project"
+      dataset: "dbt_bike"              # dataset BigQuery
+      threads: 4
+      keyfile: "/root/.dbt/gcp-service-account.json"
+      location: "US"                    # ou "EU" selon ton dataset
+      priority: interactive

@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: src_local_bike
+    schema: src_local_bike
+    description: "Raw sales and production data for Local Bike from BigQuery."
+    tables:
+      - name: customers
+        description: "Customer information and demographics."
+      - name: orders
+        description: "Order headers with key dates and statuses."
+      - name: order_items
+        description: "Detailed order line items with pricing and discounts."
+      - name: stores
+        description: "Store locations in California, New York, and Texas."
+      - name: staffs
+        description: "Sales and management staff working in Local Bike stores."
+      - name: products
+        description: "Products sold, linked to brands and categories."
+      - name: categories
+        description: "Product categories such as road, mountain, and electric bikes."
+      - name: brands
+        description: "Bike brands sold by Local Bike."
+      - name: stocks
+        description: "Store-level product stock and availability."

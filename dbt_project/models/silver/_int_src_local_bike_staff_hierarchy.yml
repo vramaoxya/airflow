@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: int_src_local_bike_staff_hierarchy
+    description: '{{ doc("int_src_local_bike_staff_hierarchy") }}'
+    columns:
+      - name: staff_id
+        description: "Primary key, unique identifier for each employe."
+        data_tests:
+          - unique
+          - not_null

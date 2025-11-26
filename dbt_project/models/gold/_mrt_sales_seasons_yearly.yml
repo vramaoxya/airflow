@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: mrt_sales_seasons_yearly
+    description: '{{ doc("mrt_sales_seasons_yearly") }}'
+    columns:
+      - name: year
+        description: "The year of sell"
+        data_tests:
+          - not_null
+      - name: store
+        description: "The store associated with the sale"
+        data_tests:
+          - not_null
+      - name: sales_Winter
+        description: "The sells in winter"
+        data_tests:
+          - not_null
+      - name: sales_Spring
+        description: "The sells in spring"
+        data_tests:
+          - not_null
+      - name: sales_Summer
+        description: "The sells in summer"
+        data_tests:
+          - not_null
+      - name: sales_Autumn
+        description: "The sells in autumn"
+        data_tests:
+          - not_null

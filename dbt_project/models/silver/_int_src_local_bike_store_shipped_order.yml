@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: int_src_local_bike_store_shipped_order
+    description: '{{ doc("int_src_local_bike_store_shipped_order") }}'
+    columns:
+      - name: order_id
+        description: "The order id"
+        data_tests:
+          - not_null

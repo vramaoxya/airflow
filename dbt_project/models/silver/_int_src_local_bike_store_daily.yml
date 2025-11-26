@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: int_src_local_bike_store_daily
+    description: '{{ doc("int_src_local_bike_store_daily") }}'
+    columns:
+      - name: store_id
+        description: "The store_id."
+        data_tests:
+          - not_null

@@ -1,0 +1,45 @@
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+# Définir les arguments globaux du DAG
+default_args = {
+    'start_date': datetime(2025, 11, 17),
+    'retries': 1
+}
+
+# Déclaration du DAG
+with DAG(
+    dag_id="dbt_pipeline",
+    default_args=default_args,
+    schedule="@daily",
+    catchup=False,
+    tags=["dbt", "pipeline"]
+) as dag:
+    # Etape 0 : test le PATH
+    dbt_path = BashOperator(
+        task_id="dbt_path",
+        bash_command="echo $PATH "
+    )
+    # Étape 1 : téléchargement des dépendances dbt
+    dbt_deps = BashOperator(
+        task_id="dbt_deps",
+        bash_command="docker exec -it dbt-core dbt deps "
+    )
+    # Étape 2 : exécution des modèles dbt
+    dbt_run = BashOperator(
+        task_id="dbt_run",
+        bash_command="docker exec -it dbt-core dbt run "
+    )
+    # Étape 3 : exécution des tests de qualité
+    dbt_test = BashOperator(
+        task_id="dbt_test",
+        bash_command="docker exec -it dbt-core dbt test "
+    )
+    # Étape 4 : génération de la documentation statique
+    dbt_docs = BashOperator(
+        task_id="dbt_docs",
+        bash_command="docker exec -it dbt-core dbt docs generate "
+    )
+    # Définition de la chaîne de dépendances
+    dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs

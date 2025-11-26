@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: mrt_order_shipped_aborted_montly
+    description: '{{ doc("mrt_order_shipped_aborted_montly") }}'
+    columns:
+      - name: month
+        description: "The month of the aborted sale"
+        data_tests:
+          - not_null
+      - name: nb_shipped_aborted
+        description: "The number of aborted order"
+        data_tests:
+          - not_null
+      - name: total_aborted_sales
+        description: "The cost of aborted order"
+        data_tests:
+          - not_null
+      - name: store_name
+        description: "The store name"
+        data_tests:
+          - not_null

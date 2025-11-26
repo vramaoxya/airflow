@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: mrt_staff_sales_monthly
+    description: '{{ doc("mrt_staff_sales_monthly") }}'
+    columns:
+      - name: staff_name
+        description: "The seller name"
+        data_tests:
+          - not_null

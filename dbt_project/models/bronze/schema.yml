@@ -1,0 +1,163 @@
+version: 2
+
+models:
+  - name: stg_src_local_bike_stores
+    description: "Store locations in California, New York, and Texas."
+    columns:
+      - name: store_id
+        description: "Primary key, unique identifier for each store."
+        data_tests:
+          - unique
+          - not_null
+      - name: store_email
+        data_tests:
+          - not_null
+      - name: store_name
+        description: "The list of stores."
+        data_tests:
+          - accepted_values:
+             name: accepted_values_for_the_stores
+             arguments:
+                values: var('list_accepted_stores')
+  - name: stg_src_local_bike_brands
+    description: "Bike brands sold by Local Bike."
+    columns:
+      - name: brand_id
+        description: "Primary key, unique identifier for each brand."
+        data_tests:
+          - unique
+          - not_null
+  - name: stg_src_local_bike_customers
+    description: "Customer informations."
+    columns:
+      - name: customer_id
+        description: "Primary key, unique identifier for each brand."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_email
+        data_tests:
+          - not_null
+  - name: stg_src_local_bike_orders
+    description: "Order headers with key dates and statuses"
+    columns:
+      - name: order_id
+        description: "Primary key, unique identifier for each order."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_customers')
+                field: customer_id
+      - name: store_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_stores')
+                field: store_id
+      - name: staff_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_staffs')
+                field: staff_id
+  - name: stg_src_local_bike_products
+    description: "Products sold, linked to brands and categories."
+    columns:
+      - name: product_id
+        description: "Primary key, unique identifier for each product."
+        data_tests:
+          - unique
+          - not_null
+      - name: brand_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_brands')
+                field: brand_id
+      - name: category_id                
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_categories')
+                field: category_id                          
+  - name: stg_src_local_bike_staffs
+    description: "Sales and management staff working in Local Bike stores."
+    columns:
+      - name: staff_id
+        description: "Primary key, unique identifier for each staff."
+        data_tests:
+          - unique
+          - not_null         
+      - name: staff_email
+        data_tests:
+          - not_null
+      - name: store_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_stores')
+                field: store_id              
+  - name: stg_src_local_bike_categories
+    description: "Product categories such as road, mountain, and electric bikes."
+    columns:
+      - name: category_id
+        description: "Primary key, unique identifier for each category."
+        data_tests:
+          - unique
+          - not_null
+  - name: stg_src_local_bike_order_items
+    description: "Detailed order line items with pricing and discounts."
+    columns:
+      - name: order_id
+        description: "Primary key, composite key with item_id"
+        data_tests:
+          - not_null
+      - name: item_id
+        description: "Primary key, composite key with order_id"
+        data_tests:
+          - not_null
+      - name: quantity
+        description: "Order quantity"
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: list_price
+        description: "Order prices"
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0                      
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_products')
+                field: product_id
+      - name: total_item_discount_sold
+        description: "quantity * list_price * (1 - discount)"  
+        data_tests:
+          - not_null
+  - name: stg_src_local_bike_stocks
+    description: "Stock of products and availability."
+    columns:
+      - name: store_id
+        description: "Primary key, composite key with product_id."
+        data_tests:
+          - not_null
+      - name: product_id
+        description: "Primary key, composite key with store_id."
+        data_tests:
+          - not_null          
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_src_local_bike_products')
+                field: product_id           

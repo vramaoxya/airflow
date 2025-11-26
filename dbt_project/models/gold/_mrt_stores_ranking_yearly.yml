@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: mrt_stores_ranking_yearly
+    description: '{{ doc("mrt_stores_ranking_yearly") }}'
+    columns:
+      - name: year_date
+        description: "The year of sell"
+        data_tests:
+          - not_null
+      - name: store_name
+        description: "The store associated with the sale"
+        data_tests:
+          - not_null          
+      - name: store_latitude
+        description: "Store latitude coordinates"
+        data_tests:
+          - not_null
+      - name: store_longitude
+        description: "Store longitude coordinates"
+        data_tests:
+          - not_null 
+      - name: total_sales
+        description: "The total sales"
+        data_tests:
+          - not_null
+      - name: store_rank
+        description: "Store rankings"
+        data_tests:
+          - not_null          

@@ -1,0 +1,134 @@
+#version: '3.8'
+
+services:
+
+  # --------------------------------------------------------------------------
+  # POSTGRES (obligatoire pour Airflow)
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} 
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    #healthcheck:
+    #  test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+    #  interval: 10s
+    #  retries: 5
+    #  start_period: 5s      
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW WEBSERVER
+  # --------------------------------------------------------------------------
+  airflow-webserver:
+    build: ./airflow 
+    depends_on:
+      - postgres
+    env_file:
+      - .env     
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY} 
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    ports:
+      - "8080:8080"
+    command: api-server
+    #user: 
+    #  "${AIRFLOW_UID:-50000}:0"
+    #healthcheck:
+    #  test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
+    #  interval: 30s
+    #  timeout: 10s
+    #  retries: 5
+    #  start_period: 30s
+    restart: always
+    #command: webserver # A partir de la version Airflow 2.9+ c'est api-server
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW SCHEDULER (séparé)
+  # --------------------------------------------------------------------------
+  airflow-scheduler:
+    build: ./airflow_docker 
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY} 
+      #AIRFLOW_PROJ_DIR: ${AIRFLOW_PROJ_DIR}
+      DBT_PROJ_DIR: ${DBT_PROJ_DIR}
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}      
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    - /var/run/docker.sock:/var/run/docker.sock
+    #user: 
+    #  "${AIRFLOW_UID:-50000}:0"
+    command: scheduler
+    restart: always
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW DAG PROCESSOR (séparé)
+  # --------------------------------------------------------------------------
+  airflow-dag-processor:
+    build: ./airflow_docker 
+    depends_on:
+      - postgres
+    env_file:
+      - .env      
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      #AIRFLOW_PROJ_DIR: ${AIRFLOW_PROJ_DIR}
+      DBT_PROJ_DIR: ${DBT_PROJ_DIR}
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}      
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    - /var/run/docker.sock:/var/run/docker.sock    
+    #user: 
+    #  "${AIRFLOW_UID:-50000}:0"
+    command: dag-processor 
+    restart: always
+
+  # --------------------------------------------------------------------------
+  # DBT CORE + DBT BIGQUERY (isolé, dernière version)
+  # --------------------------------------------------------------------------
+  dbt-core:
+    build: ./dbt
+    container_name: dbt-core
+    env_file:
+      - .env    
+    volumes:
+      - ./dbt_project:/usr/app/dbt
+      - ~/.dbt:/root/.dbt
+    command: ["sleep", "infinity"]    # pour que le conteneur reste en vie
+    environment:
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}
+
+volumes:
+  postgres-db:

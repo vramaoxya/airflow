@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: int_src_local_bike_staff_daily
+    description: '{{ doc("int_src_local_bike_staff_daily") }}'
+    columns:
+      - name: staff_id
+        description: "The staff_id."
+        data_tests:
+          - not_null
+      - name: store_id
+        description: "The store_id."
+        data_tests:
+          - not_null
