@@ -1,14 +1,15 @@
 # **🚀 Overview**
 
 This project provides a modern containerized Analytics Engineering (AE) environment using:
-Apache Airflow 3.1 (Scheduler, Webserver, DAG Processor)
-dbt Core (CLI inside a dedicated container)
-dbt Docs Server (served by NGINX)
-PostgreSQL 18 (Airflow Metadata DB)
-Docker Compose for orchestration
-Airbyte Cloud for EL ingestion (triggered from Airflow)
-This setup is designed for Data Engineering / Analytics Engineering teams who want a fully local, reproducible, cloud-ready orchestration platform.
 
+- [ ] Apache Airflow 3.1 (Scheduler, Webserver, DAG Processor)
+- [ ] dbt Core (CLI inside a dedicated container)
+- [ ] dbt Docs Server (served by NGINX)
+- [ ] PostgreSQL 15 (Airflow Metadata DB)
+- [ ] Docker Compose for orchestration
+- [ ] Airbyte Cloud for EL ingestion (triggered from Airflow)
+
+This setup is designed for Data Engineering / Analytics Engineering teams who want a fully local, reproducible, cloud-ready orchestration platform.
 
 # 🌐Data Stack version
 
@@ -18,7 +19,7 @@ This setup is designed for Data Engineering / Analytics Engineering teams who wa
 - Python : 3.12.12
 - git : 2.39.5
 - PostgreSQL : 18.1
-- dbt-core : 
+- dbt-core :
   - installed : 1.5.0
   - plugins :
     - bigquery: 1.5.9
@@ -26,37 +27,36 @@ This setup is designed for Data Engineering / Analytics Engineering teams who wa
 - Apache Airflow : 3.1.3
 
 - Providers info
-- - apache-airflow-providers-airbyte          | 5.2.5 
-- - apache-airflow-providers-amazon           | 9.16.0
-- - apache-airflow-providers-celery           | 3.13.0
-- - apache-airflow-providers-cncf-kubernetes  | 10.9.0
-- - apache-airflow-providers-common-compat    | 1.8.0 
-- - apache-airflow-providers-common-io        | 1.6.4 
-- - apache-airflow-providers-common-messaging | 2.0.0 
-- - apache-airflow-providers-common-sql       | 1.28.2
-- - apache-airflow-providers-docker           | 4.4.4 
-- - apache-airflow-providers-elasticsearch    | 6.3.4 
-- - apache-airflow-providers-fab              | 3.0.1 
-- - apache-airflow-providers-ftp              | 3.13.2
-- - apache-airflow-providers-git              | 0.0.9 
-- - apache-airflow-providers-google           | 18.1.0
-- - apache-airflow-providers-grpc             | 3.8.2 
-- - apache-airflow-providers-hashicorp        | 4.3.3 
-- - apache-airflow-providers-http             | 5.4.0 
-- - apache-airflow-providers-microsoft-azure  | 12.8.0
-- - apache-airflow-providers-mysql            | 6.3.4 
-- - apache-airflow-providers-odbc             | 4.10.2
-- - apache-airflow-providers-openlineage      | 2.7.3 
-- - apache-airflow-providers-postgres         | 6.4.0 
-- - apache-airflow-providers-redis            | 4.3.2 
-- - apache-airflow-providers-sendgrid         | 4.1.4 
-- - apache-airflow-providers-sftp             | 5.4.1 
-- - apache-airflow-providers-slack            | 9.4.0 
-- - apache-airflow-providers-smtp             | 2.3.1 
-- - apache-airflow-providers-snowflake        | 6.6.0 
-- - apache-airflow-providers-ssh              | 4.1.5 
-- - apache-airflow-providers-standard         | 1.9.1 
-
+- - apache-airflow-providers-airbyte | 5.2.5
+- - apache-airflow-providers-amazon | 9.16.0
+- - apache-airflow-providers-celery | 3.13.0
+- - apache-airflow-providers-cncf-kubernetes | 10.9.0
+- - apache-airflow-providers-common-compat | 1.8.0
+- - apache-airflow-providers-common-io | 1.6.4
+- - apache-airflow-providers-common-messaging | 2.0.0
+- - apache-airflow-providers-common-sql | 1.28.2
+- - apache-airflow-providers-docker | 4.4.4
+- - apache-airflow-providers-elasticsearch | 6.3.4
+- - apache-airflow-providers-fab | 3.0.1
+- - apache-airflow-providers-ftp | 3.13.2
+- - apache-airflow-providers-git | 0.0.9
+- - apache-airflow-providers-google | 18.1.0
+- - apache-airflow-providers-grpc | 3.8.2
+- - apache-airflow-providers-hashicorp | 4.3.3
+- - apache-airflow-providers-http | 5.4.0
+- - apache-airflow-providers-microsoft-azure | 12.8.0
+- - apache-airflow-providers-mysql | 6.3.4
+- - apache-airflow-providers-odbc | 4.10.2
+- - apache-airflow-providers-openlineage | 2.7.3
+- - apache-airflow-providers-postgres | 6.4.0
+- - apache-airflow-providers-redis | 4.3.2
+- - apache-airflow-providers-sendgrid | 4.1.4
+- - apache-airflow-providers-sftp | 5.4.1
+- - apache-airflow-providers-slack | 9.4.0
+- - apache-airflow-providers-smtp | 2.3.1
+- - apache-airflow-providers-snowflake | 6.6.0
+- - apache-airflow-providers-ssh | 4.1.5
+- - apache-airflow-providers-standard | 1.9.1
 
 # **🧱 Docker Architecture**
 
@@ -99,26 +99,162 @@ Below is the high-level architecture of the system.
          │  └──────────────────────────────┘                         │
          └───────────────────────────────────────────────────────────┘
 
+_docker-compose.yml_
+```yaml
+services:
 
+  # --------------------------------------------------------------------------
+  # POSTGRES (obligatoire pour Airflow)
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} 
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data    
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW WEBSERVER
+  # --------------------------------------------------------------------------
+  airflow-webserver:
+    build: ./airflow 
+    depends_on:
+      - postgres
+    env_file:
+      - .env     
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY} 
+      AIRFLOW__WEBSERVER__TEST_CONNECTION: "enable"
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./config/airflow.cfg:/opt/airflow/airflow.cfg    
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    ports:
+      - "8080:8080"
+    command: api-server
+    restart: always
+    #command: webserver # A partir de la version Airflow 2.9+ c'est api-server
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW SCHEDULER (séparé)
+  # --------------------------------------------------------------------------
+  airflow-scheduler:
+    build: ./airflow_docker 
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY} 
+      DBT_PROJ_DIR: ${DBT_PROJ_DIR}
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}      
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./config/airflow.cfg:/opt/airflow/airflow.cfg    
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    - /var/run/docker.sock:/var/run/docker.sock
+    command: scheduler
+    restart: always
+
+  # --------------------------------------------------------------------------
+  # AIRFLOW DAG PROCESSOR (séparé)
+  # --------------------------------------------------------------------------
+  airflow-dag-processor:
+    build: ./airflow_docker 
+    depends_on:
+      - postgres
+    env_file:
+      - .env      
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DBT_PROJ_DIR: ${DBT_PROJ_DIR}
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}      
+    volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./scripts:/opt/airflow/scripts
+    - ./plugins:/opt/airflow/plugins
+    - ./config/airflow.cfg:/opt/airflow/airflow.cfg    
+    - ./dbt:/opt/airflow/dbt
+    - ~/.dbt:/home/airflow/.dbt
+    - /var/run/docker.sock:/var/run/docker.sock    
+    command: dag-processor 
+    restart: always
+
+  # --------------------------------------------------------------------------
+  # DBT DOCS SERVER
+  # --------------------------------------------------------------------------
+  dbt-docs-server:
+    build: ./dbt_docs
+    depends_on:
+      - airflow-webserver 
+    container_name: dbt-docs
+    volumes:
+      - ./dbt_project/target:/usr/share/nginx/html/dbt-docs # Monte le dossier de documentation 
+    ports:
+      - "8081:80" # Hôte 8081 -> Conteneur 80 (Serveur Web pour les docs)
+    # Ce service démarre APRÈS que dbt docs generate ait été exécuté
+    restart: always
+
+  # --------------------------------------------------------------------------
+  # DBT CORE + DBT BIGQUERY (isolé, dernière version)
+  # --------------------------------------------------------------------------
+  dbt-core:
+    build: ./dbt
+    container_name: dbt-core
+    env_file:
+      - .env    
+    volumes:
+      - ./dbt_project:/usr/app/dbt
+      - ~/.dbt:/root/.dbt
+    command: ["sleep", "infinity"]    # pour que le conteneur reste en vie
+    environment:
+      DBT_PROFILES_DIR: ${DBT_PROFILES_DIR}
+
+volumes:
+  postgres-db:
+```
 
 # 🌐URLs (Local Environment)
 
-Component	URL : 
-- Airflow Web UI	http://localhost:8080
-![Airflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
+Component URL :
 
-- dbt Docs Server	http://localhost:8081
-![dbt docs server](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
+- Airflow Web UI http://localhost:8080
+  ![Airflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
+
+- dbt Docs Server http://localhost:8081
+  ![dbt docs server](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
 
 # **🧩 Containers Overview**
 
 ## 🔵 Airflow Scheduler
 
-Executes DAG tasks : 
+Executes DAG tasks :
+
 - Triggers dbt jobs
 - Airbyte syncs
 - Python tasks
-  
+
 Communicates with Airflow Metadata DB (Postgres)
 Talks to Docker via the docker.sock mount
 
@@ -137,6 +273,7 @@ Detects import errors
 ## 🟣 dbt-core
 
 CLI for dbt commands:
+
 - dbt deps
 - dbt seed
 - dbt debug
@@ -155,6 +292,7 @@ Static hosting via NGINX on port 8081
 ## 🟢 PostgreSQL
 
 Stores Airflow metadata:
+
 - DAG Runs
 - Task Instances
 - Variables / Connections
@@ -162,20 +300,22 @@ Stores Airflow metadata:
 
 ## 📂 Airflow DAGs Included
 
-DAG Name File Description : 
+DAG Name File Description :
 
-- *airbyte_http.py*	(dag : airbyte_http_sync) --> Test the connexion with Airbyte
-- *dbt_steps.py* (dag : dbt_pipeline) --> Run dbt deps, dbttest, dbt run, dbt docs generate
-- *mon_dag1.py*	(dag : simple_python_dag) --> Basic PythonOperator example printing logs
-- *test1_dag.py* (dag : etl_pipeline) -->  Example ETL flow 
-- *chaine_airbyte.py* (dag : full_pipeline) : --> Complete chain ingestion : airbyte cloud + dbt seed + dbt run + dbt test + dbt docs generate
+- _airbyte_http.py_ (dag : airbyte_http_sync) --> Test the connexion with Airbyte
+- _dbt_steps.py_ (dag : dbt_pipeline) --> Run dbt deps, dbttest, dbt run, dbt docs generate
+- _mon_dag1.py_ (dag : simple_python_dag) --> Basic PythonOperator example printing logs
+- _test1_dag.py_ (dag : etl_pipeline) --> Example ETL flow
+- _chaine_airbyte.py_ (dag : full_pipeline) : --> Complete chain ingestion : airbyte cloud + dbt seed + dbt run + dbt test + dbt docs generate
 
 And mounted in the containers at:
+
 - /opt/airflow/dags
 
 ## 📂 Airflow DAGs scripts
 
-airbyte_http.py
+_airbyte_http.py_
+
 ```python
 from airflow import DAG
 from airflow.providers.http.operators.http import HttpOperator
@@ -207,11 +347,10 @@ with DAG(
 trigger_sync
 ```
 
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
 
-![Workflow1](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
+_dbt_steps.py _
 
-
-dbt_steps.py 
 ```python
 from airflow import DAG
 from airflow.operators.bash import BashOperator
@@ -260,12 +399,11 @@ with DAG(
     dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
-.
-![Workflow2](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
 
+_mon_dag1.py_
 
-mon_dag1.py
-````python
+```python
 from airflow import DAG
 #from airflow.operators.empty.EmptyOperator
 from airflow.operators.python import PythonOperator
@@ -292,11 +430,9 @@ with DAG(
     start >> python_task >> end
 ```
 
-.
-![Workflow3](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
 
-
-test1_dag.py
+_test1_dag.py_
 ```python
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -336,12 +472,10 @@ transform_task >> load_task
 normalize_task >> clean_task >> load_task
 ```
 
-.
-![Workflow4](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
 
-
-chaine_airbyte.py
-````python
+_chaine_airbyte.py_
+```python
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 #from airflow.providers.airbyte.operators.airbyte import AirbyteTriggerSyncOperator
@@ -410,9 +544,7 @@ with DAG(
     dbt_path >> [dbt_seed,airbyte_sync] >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
-.
-![Workflow5](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
-
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
 
 # ⚙️ Key Steps to Start the Project
 
@@ -436,8 +568,7 @@ docker compose ps
 ## 5. Open Airflow UI
 
 http://localhost:8080
-
-![Workflow6](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
 
 # 🛠️ Essential Docker Commands Cheat Sheet
 
@@ -493,7 +624,8 @@ docker compose logs -f
 
 ## Sources (via Airbyte Cloud)
 
-![Airbyte1](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
+![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
+
 
 ### Typical ingestion sources:
 
@@ -501,12 +633,12 @@ CSV Files
 
 Example:
 ad_clicks → Data Warehouse
-![Airbyte2](https://github.com/vramaoxya/airflow/blob/main/images/airbyte_connexion.png)
+![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/airbyte_connexion.png)
 
 
 ### Targets (via dbt)
 
-- Data Warehouse : BigQuery 
+- Data Warehouse : BigQuery
 - Transformation models: staging, intermediate, marts
 - Documentation & lineage (via dbt Docs)
 - ![alt text](https://github.com/vramaoxya/localbike "dbt localbike")
