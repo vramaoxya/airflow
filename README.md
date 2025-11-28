@@ -219,7 +219,7 @@ with DAG(
 
 Reference-style: 
 ![alt text][workflow]
-[workflow] : images/airflow_graph_etl_pipeline.png
+[workflow] : ./images/airflow_graph_etl_pipeline.png
 
 
 trigger_sync
