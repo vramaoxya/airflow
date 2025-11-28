@@ -207,7 +207,9 @@ with DAG(
 trigger_sync
 ```
 
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
+
 
 dbt_steps.py 
 ```python
@@ -258,7 +260,9 @@ with DAG(
     dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
+
 
 mon_dag1.py
 ````python
@@ -289,7 +293,9 @@ with DAG(
 
 ```
 
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
+
 
 test1_dag.py
 ```python
@@ -331,7 +337,9 @@ transform_task >> load_task
 normalize_task >> clean_task >> load_task
 ```
 
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
+
 
 chaine_airbyte.py
 ````python
@@ -403,7 +411,9 @@ with DAG(
     dbt_path >> [dbt_seed,airbyte_sync] >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
+
 
 # ⚙️ Key Steps to Start the Project
 
