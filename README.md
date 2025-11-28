@@ -1,19 +1,12 @@
 # **🚀 Overview**
 
 This project provides a modern containerized Analytics Engineering (AE) environment using:
-
 Apache Airflow 3.1 (Scheduler, Webserver, DAG Processor)
-
 dbt Core (CLI inside a dedicated container)
-
 dbt Docs Server (served by NGINX)
-
-PostgreSQL 15 (Airflow Metadata DB)
-
+PostgreSQL 18 (Airflow Metadata DB)
 Docker Compose for orchestration
-
 Airbyte Cloud for EL ingestion (triggered from Airflow)
-
 This setup is designed for Data Engineering / Analytics Engineering teams who want a fully local, reproducible, cloud-ready orchestration platform.
 
 
@@ -25,12 +18,12 @@ This setup is designed for Data Engineering / Analytics Engineering teams who wa
 - Python : 3.12.12
 - git : 2.39.5
 - PostgreSQL : 18.1
-- AirByte : AirByte Cloud
-- Apache Airflow : 3.1.3
 - dbt-core : 
   - installed : 1.5.0
   - plugins :
     - bigquery: 1.5.9
+- AirByte : AirByte Cloud
+- Apache Airflow : 3.1.3
 
 - Providers info
 - - apache-airflow-providers-airbyte          | 5.2.5 
@@ -112,8 +105,10 @@ Below is the high-level architecture of the system.
 
 Component	URL : 
 - Airflow Web UI	http://localhost:8080
-- dbt Docs Server	http://localhost:8081
+![Airflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
 
+- dbt Docs Server	http://localhost:8081
+![dbt docs server](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
 
 # **🧩 Containers Overview**
 
@@ -214,7 +209,6 @@ trigger_sync
 
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
 
-
 dbt_steps.py 
 ```python
 from airflow import DAG
@@ -263,6 +257,7 @@ with DAG(
     # Définition de la chaîne de dépendances
     dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
 
 mon_dag1.py
 ````python
@@ -292,6 +287,7 @@ with DAG(
     start >> python_task >> end
 
 ```
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
 
 test1_dag.py
 ```python
@@ -332,6 +328,8 @@ extract_task >> [transform_task, normalize_task]
 transform_task >> load_task
 normalize_task >> clean_task >> load_task
 ```
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
+
 
 chaine_airbyte.py
 ````python
@@ -402,7 +400,7 @@ with DAG(
     # Définition de la chaîne de dépendances
     dbt_path >> [dbt_seed,airbyte_sync] >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
-
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
 
 # ⚙️ Key Steps to Start the Project
 
@@ -427,6 +425,8 @@ docker compose ps
 
 http://localhost:8080
 
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
+
 # 🛠️ Essential Docker Commands Cheat Sheet
 
 ### 💠 Configuration & Inspect
@@ -450,7 +450,7 @@ docker compose logs -f
 - docker compose logs -f airflow-webserver
 
 
-### Tail mode:
+### Tail mode example
 
 - docker compose logs airflow-webserver --tail 50
 - docker compose logs airflow-scheduler --tail 50
@@ -475,11 +475,14 @@ docker compose logs -f
 ### 💠 DAG diagnostics
 - docker compose exec airflow-scheduler airflow dags list
 - docker compose exec airflow-scheduler airflow dags list-import-errors
-- docker compose exec airflow-scheduler airflow dags delete dbt_pipeline
+- docker compose exec airflow-scheduler airflow dags delete <dag>
 
 # 🔄 Data Sources & Targets (High-Level)
 
 ## Sources (via Airbyte Cloud)
+
+![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
+
 
 ### Typical ingestion sources:
 
@@ -487,12 +490,15 @@ CSV Files
 
 Example:
 ad_clicks → Data Warehouse
+![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/airbyte_connexion.png)
+
 
 ### Targets (via dbt)
 
 - Data Warehouse : BigQuery 
 - Transformation models: staging, intermediate, marts
 - Documentation & lineage (via dbt Docs)
+- ![alt text](https://github.com/vramaoxya/localbike "dbt localbike")
 
 ## 🎯 What This Stack Enables
 
