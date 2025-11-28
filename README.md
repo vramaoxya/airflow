@@ -20,25 +20,17 @@ This setup is designed for Data Engineering / Analytics Engineering teams who wa
 # 🌐Data Stack version
 
 - OS : Ubuntu 25.10
-
 - Docker : 29.0.2, build 8108357
-
 - Docker Compose : v2.40.3
-
 - Python : 3.12.12
-
 - git : 2.39.5
-
 - PostgreSQL : 18.1
-
+- AirByte : AirByte Cloud
+- Apache Airflow : 3.1.3
 - dbt-core : 
   - installed : 1.5.0
   - plugins :
     - bigquery: 1.5.9
-
-- AirByte : AirByte Cloud
-
-Apache Airflow : 3.1.3
 
 - Providers info
 - - apache-airflow-providers-airbyte          | 5.2.5 
@@ -217,13 +209,13 @@ with DAG(
         log_response=True,
     )
 
+trigger_sync
+```
+
 Reference-style: 
 ![alt text][workflow]
 [workflow] : ./images/airflow_graph_etl_pipeline.png
 
-
-trigger_sync
-```
 
 dbt_steps.py 
 ```python
