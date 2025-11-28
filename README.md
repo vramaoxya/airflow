@@ -257,6 +257,7 @@ with DAG(
     # Définition de la chaîne de dépendances
     dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
 
 mon_dag1.py
@@ -287,6 +288,7 @@ with DAG(
     start >> python_task >> end
 
 ```
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
 
 test1_dag.py
@@ -328,8 +330,8 @@ extract_task >> [transform_task, normalize_task]
 transform_task >> load_task
 normalize_task >> clean_task >> load_task
 ```
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
 
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
 
 chaine_airbyte.py
 ````python
@@ -400,6 +402,7 @@ with DAG(
     # Définition de la chaîne de dépendances
     dbt_path >> [dbt_seed,airbyte_sync] >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
+
 ![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
 
 # ⚙️ Key Steps to Start the Project
@@ -482,7 +485,6 @@ docker compose logs -f
 ## Sources (via Airbyte Cloud)
 
 ![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
-
 
 ### Typical ingestion sources:
 
