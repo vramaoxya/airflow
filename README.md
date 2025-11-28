@@ -208,7 +208,7 @@ trigger_sync
 ```
 
 
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
+![Workflow1](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
 
 
 dbt_steps.py 
@@ -260,8 +260,8 @@ with DAG(
     dbt_path >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
-
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
+.
+![Workflow2](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_dbt_pipeline.png)
 
 
 mon_dag1.py
@@ -290,11 +290,10 @@ with DAG(
     end = EmptyOperator(task_id='end')
 
     start >> python_task >> end
-
 ```
 
-
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
+.
+![Workflow3](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_simple_python_dag.png)
 
 
 test1_dag.py
@@ -337,8 +336,8 @@ transform_task >> load_task
 normalize_task >> clean_task >> load_task
 ```
 
-
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
+.
+![Workflow4](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_etl_pipeline.png)
 
 
 chaine_airbyte.py
@@ -411,8 +410,8 @@ with DAG(
     dbt_path >> [dbt_seed,airbyte_sync] >> dbt_deps >> dbt_run >> dbt_test >> dbt_docs
 ```
 
-
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
+.
+![Workflow5](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_full_pipeline.png)
 
 
 # ⚙️ Key Steps to Start the Project
@@ -438,7 +437,7 @@ docker compose ps
 
 http://localhost:8080
 
-![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
+![Workflow6](https://github.com/vramaoxya/airflow/blob/main/images/airflow_dags_home.png)
 
 # 🛠️ Essential Docker Commands Cheat Sheet
 
@@ -494,7 +493,7 @@ docker compose logs -f
 
 ## Sources (via Airbyte Cloud)
 
-![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
+![Airbyte1](https://github.com/vramaoxya/airflow/blob/main/images/dbt_docs.png)
 
 ### Typical ingestion sources:
 
@@ -502,7 +501,7 @@ CSV Files
 
 Example:
 ad_clicks → Data Warehouse
-![Airbyte](https://github.com/vramaoxya/airflow/blob/main/images/airbyte_connexion.png)
+![Airbyte2](https://github.com/vramaoxya/airflow/blob/main/images/airbyte_connexion.png)
 
 
 ### Targets (via dbt)
