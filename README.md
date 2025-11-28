@@ -212,9 +212,7 @@ with DAG(
 trigger_sync
 ```
 
-Reference-style: 
-![alt text][workflow]
-[workflow] : ./images/airflow_graph_etl_pipeline.png
+![Workflow](https://github.com/vramaoxya/airflow/blob/main/images/airflow_graph_airbyte_http_sync.png)
 
 
 dbt_steps.py 
