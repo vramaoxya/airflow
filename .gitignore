@@ -2,3 +2,4 @@ scripts/*.json
 scripts/*.py
 *.json
 logs/*
+logs/dag_processor/*
