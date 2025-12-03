@@ -23,7 +23,7 @@ services:
   # AIRFLOW WEBSERVER
   # --------------------------------------------------------------------------
   airflow-webserver:
-    build: ./airflow 
+    build: ./airflow_docker
     depends_on:
       - postgres
     env_file:
